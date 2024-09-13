@@ -51,6 +51,7 @@ class CalendarView: UIView {
         
         //setup previous button
         previousButton.setImage(previousBtnImage, for: .normal)
+        previousButton.tintColor = .black
         previousButton.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
         headerView.addSubview(previousButton)
         
@@ -62,6 +63,7 @@ class CalendarView: UIView {
         
         //setup next button
         nextButton.setImage(nextBtnImage, for: .normal)
+        nextButton.tintColor = .black
         nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         headerView.addSubview(nextButton)
         
@@ -149,6 +151,6 @@ extension CalendarView: UICollectionViewDataSource {
 
 extension CalendarView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //
+        print("Selected date: ---")
     }
 }
