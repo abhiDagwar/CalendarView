@@ -15,14 +15,17 @@ class CalendarView: UIView {
     var headerTitle: String = "MONTH NAME"
     
     //UI Element
+    private let headerView =  UIView()
     private let previousButton = UIButton(type: .system)
     private let nextButton = UIButton(type: .system)
     private let headerLabel = UILabel()
+    private var collectionView: UICollectionView!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         //setup header view
         setupHeaderView()
+        setupCollectionView()
     }
     
     required init?(coder: NSCoder) {
@@ -31,8 +34,9 @@ class CalendarView: UIView {
         setupHeaderView()
     }
     
+    //setup headerview for calendar
     func setupHeaderView() {
-        let headerView = UIView()
+        //setup a headerview
         headerView.backgroundColor = headerviewBackgroundColor
         headerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(headerView)
@@ -80,11 +84,71 @@ class CalendarView: UIView {
         ])
     }
     
+    //setup collectionview for calendar dates and weeks name.
+    func setupCollectionView() {
+        //setup a layout
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 0
+        
+        //setup a collectioview using the above layout
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .white
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        //Register cell for the above collectionview
+        collectionView.register(CalendarViewCell.self, forCellWithReuseIdentifier: "CalendarViewCell")
+        //Register a headerview to show days of week
+        collectionView.register(CalendarViewDaysHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "CalendarViewDaysHeader")
+        //add collectionview to view
+        addSubview(collectionView)
+        
+        //setup autolayout for collectionview
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
+    
     @objc private func previousButtonTapped() {
         print("Previous button tapped...")
     }
     
     @objc private func nextButtonTapped() {
         print("Next button tapped...")
+    }
+}
+
+extension CalendarView: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "CalendarViewDaysHeader", for: indexPath) as! CalendarViewDaysHeader
+            return headerView
+        }
+        return UICollectionReusableView()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 40) //Adjust height as needed
+    }
+}
+
+extension CalendarView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath)
+        return cell
+    }
+}
+
+extension CalendarView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //
     }
 }
