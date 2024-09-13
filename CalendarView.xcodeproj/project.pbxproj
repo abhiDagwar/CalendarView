@@ -13,6 +13,7 @@
 		5219FEFC2C93F3EE006CABA8 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5219FEFB2C93F3EE006CABA8 /* Base */; };
 		5219FEFE2C93F3F0006CABA8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5219FEFD2C93F3F0006CABA8 /* Assets.xcassets */; };
 		5219FF012C93F3F0006CABA8 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5219FF002C93F3F0006CABA8 /* Base */; };
+		5219FF0B2C9402CE006CABA8 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5219FF0A2C9402CE006CABA8 /* CalendarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		5219FEFD2C93F3F0006CABA8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5219FF002C93F3F0006CABA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5219FF022C93F3F0006CABA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5219FF0A2C9402CE006CABA8 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 				5219FEF42C93F3EE006CABA8 /* AppDelegate.swift */,
 				5219FEF62C93F3EE006CABA8 /* SceneDelegate.swift */,
 				5219FEF82C93F3EE006CABA8 /* ViewController.swift */,
+				5219FF0A2C9402CE006CABA8 /* CalendarView.swift */,
 				5219FEFA2C93F3EE006CABA8 /* Main.storyboard */,
 				5219FEFD2C93F3F0006CABA8 /* Assets.xcassets */,
 				5219FEFF2C93F3F0006CABA8 /* LaunchScreen.storyboard */,
@@ -140,6 +143,7 @@
 			files = (
 				5219FEF92C93F3EE006CABA8 /* ViewController.swift in Sources */,
 				5219FEF52C93F3EE006CABA8 /* AppDelegate.swift in Sources */,
+				5219FF0B2C9402CE006CABA8 /* CalendarView.swift in Sources */,
 				5219FEF72C93F3EE006CABA8 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
