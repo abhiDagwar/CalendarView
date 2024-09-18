@@ -17,6 +17,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         //setup calendarview
         setupCalendarView()
+        print(calendarView.collectionView.frame.size.height)
     }
     
     func setupCalendarView() {
@@ -32,7 +33,7 @@ class ViewController: UIViewController {
             calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0, constant: view.frame.size.width)
+            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor)
         ])
     }
 }

@@ -19,8 +19,8 @@ class CalendarView: UIView {
     private let previousButton = UIButton(type: .system)
     private let nextButton = UIButton(type: .system)
     private let headerLabel = UILabel()
-    private var collectionView: UICollectionView!
-
+    var collectionView: UICollectionView!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         //setup header view
@@ -32,10 +32,20 @@ class CalendarView: UIView {
         super.init(coder: coder)
         //setup header view
         setupHeaderView()
+        setupCollectionView()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Ensure collectionView has a valid frame size before setting the cell size
+        if collectionView.frame.size.width > 0 {
+            setupCellView()  // Adjust the cell size when the view's layout changes (e.g., on rotation)
+        }
+        
     }
     
     //setup headerview for calendar
-    func setupHeaderView() {
+    private func setupHeaderView() {
         //setup a headerview
         headerView.backgroundColor = headerviewBackgroundColor
         headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -46,7 +56,7 @@ class CalendarView: UIView {
             headerView.topAnchor.constraint(equalTo: topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.12)
+            headerView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.09)
         ])
         
         //setup previous button
@@ -87,14 +97,15 @@ class CalendarView: UIView {
     }
     
     //setup collectionview for calendar dates and weeks name.
-    func setupCollectionView() {
-        //setup a layout
+    private func setupCollectionView() {
+        //setup a flow layout
         let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 2  // Space between items in the same row
+        layout.minimumLineSpacing = 2      // Space between rows of items
         
         //setup a collectioview using the above layout
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .cyan
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -113,6 +124,37 @@ class CalendarView: UIView {
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+    
+    private func setupCellView() {
+        //Get the collectionview layout
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {
+            return
+        }
+        
+        // Check that the collectionView's frame size is valid
+        if collectionView.frame.size.width <= 0 {
+            return // Exit if the collectionView has no valid size yet
+        }
+        
+        let numberOfCellsInRow: CGFloat = 7
+        let totalSpacing = layout.minimumInteritemSpacing * (numberOfCellsInRow - 1) // Total space between cells
+        
+        let availableWidth = collectionView.frame.width - totalSpacing
+        
+        // Ensure the cell width is valid (greater than zero)
+        let cellWidth = max((availableWidth / numberOfCellsInRow), 0)
+        
+        // Assign square size for cells
+        layout.itemSize = CGSize(width: cellWidth, height: cellWidth)
+        
+        layout.invalidateLayout() // Invalidate the layout to apply changes
+        
+        // Debug print for checking the values
+        print("Collection View Width: \(collectionView.frame.width)")
+        print("Available Width: \(availableWidth)")
+        print("Cell Width: \(cellWidth)")
+        layout.invalidateLayout()
     }
     
     @objc private func previousButtonTapped() {
@@ -140,7 +182,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
 
 extension CalendarView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        return 42
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
