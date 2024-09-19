@@ -13,13 +13,14 @@ class CalendarView: UIView {
     var previousBtnImage: UIImage = UIImage(systemName: "arrowshape.left.circle.fill")!
     var nextBtnImage: UIImage = UIImage(systemName: "arrowshape.right.circle.fill")!
     var headerTitle: String = "MONTH NAME"
+    var collectioViewHeight = 0.0
     
     //UI Element
     private let headerView =  UIView()
     private let previousButton = UIButton(type: .system)
     private let nextButton = UIButton(type: .system)
     private let headerLabel = UILabel()
-    var collectionView: UICollectionView!
+    private var collectionView: UICollectionView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,6 +40,7 @@ class CalendarView: UIView {
         super.layoutSubviews()
         // Ensure collectionView has a valid frame size before setting the cell size
         if collectionView.frame.size.width > 0 {
+            collectioViewHeight = collectionView.frame.height
             setupCellView()  // Adjust the cell size when the view's layout changes (e.g., on rotation)
         }
         
@@ -145,8 +147,14 @@ class CalendarView: UIView {
         // Ensure the cell width is valid (greater than zero)
         let cellWidth = max((availableWidth / numberOfCellsInRow), 0)
         
-        // Assign square size for cells
-        layout.itemSize = CGSize(width: cellWidth, height: cellWidth)
+        let numberOfRowsinColumn: CGFloat = 6 + 4 // Number of rows + extra height adjustment as per your requirement
+        let totalSpacingForRows = layout.minimumLineSpacing * (numberOfRowsinColumn - 1)
+        let availableHeight = collectionView.frame.height - totalSpacingForRows
+        let cellHeight = max((availableHeight / numberOfRowsinColumn), 0)
+        
+        // Assign size for cells
+        // Asign width and height both the same value if you want to make it square e.g. (width: cellWidth, height: cellWidth)
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         
         layout.invalidateLayout() // Invalidate the layout to apply changes
         
@@ -154,7 +162,7 @@ class CalendarView: UIView {
         print("Collection View Width: \(collectionView.frame.width)")
         print("Available Width: \(availableWidth)")
         print("Cell Width: \(cellWidth)")
-        layout.invalidateLayout()
+        print("Collection View Height: \(collectionView.frame.height)")
     }
     
     @objc private func previousButtonTapped() {
@@ -193,6 +201,6 @@ extension CalendarView: UICollectionViewDataSource {
 
 extension CalendarView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Selected date: ---")
+        print("Selected date: ---\(indexPath.item + 1)")
     }
 }
