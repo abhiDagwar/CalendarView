@@ -34,7 +34,7 @@ class ViewController: UIViewController {
             calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
             calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.58)
         ])
     }
     

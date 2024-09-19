@@ -14,6 +14,7 @@ class CalendarView: UIView {
     var nextBtnImage: UIImage = UIImage(systemName: "arrowshape.right.circle.fill")!
     var headerTitle: String = "MONTH NAME"
     var collectioViewHeight = 0.0
+    var highlightedIndexPath: IndexPath?
     
     //UI Element
     private let headerView =  UIView()
@@ -102,8 +103,8 @@ class CalendarView: UIView {
     private func setupCollectionView() {
         //setup a flow layout
         let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 2  // Space between items in the same row
-        layout.minimumLineSpacing = 2      // Space between rows of items
+        layout.minimumInteritemSpacing = 1  // Space between items in the same row
+        layout.minimumLineSpacing = 1      // Space between rows of items
         
         //setup a collectioview using the above layout
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -147,10 +148,10 @@ class CalendarView: UIView {
         // Ensure the cell width is valid (greater than zero)
         let cellWidth = max((availableWidth / numberOfCellsInRow), 0)
         
-        let numberOfRowsinColumn: CGFloat = 6 + 4 // Number of rows + extra height adjustment as per your requirement
-        let totalSpacingForRows = layout.minimumLineSpacing * (numberOfRowsinColumn - 1)
+        let numberOfRowsInColumn: CGFloat = 6 + 0.65 // Number of rows + extra height adjustment as per your requirement
+        let totalSpacingForRows = layout.minimumLineSpacing * (numberOfRowsInColumn - 1)
         let availableHeight = collectionView.frame.height - totalSpacingForRows
-        let cellHeight = max((availableHeight / numberOfRowsinColumn), 0)
+        let cellHeight = max((availableHeight / numberOfRowsInColumn), 0)
         
         // Assign size for cells
         // Asign width and height both the same value if you want to make it square e.g. (width: cellWidth, height: cellWidth)
@@ -161,6 +162,7 @@ class CalendarView: UIView {
         // Debug print for checking the values
         print("Collection View Width: \(collectionView.frame.width)")
         print("Available Width: \(availableWidth)")
+        print("Available Height: \(frame.height)")
         print("Cell Width: \(cellWidth)")
         print("Collection View Height: \(collectionView.frame.height)")
     }
@@ -194,13 +196,46 @@ extension CalendarView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath) as! CalendarViewCell
+        
+        // Example: Configure the cell with the date and selection state
+        let date = String(indexPath.item + 1) // Dummy data
+        // Configure the cell
+        cell.configure(date: date)
+
         return cell
     }
 }
 
 extension CalendarView: UICollectionViewDelegate {
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Selected date: ---\(indexPath.item + 1)")
+        highlightCellFor(collectionView, indexPath)
+    }
+    
+    private func highlightCellFor(_ collectionView: UICollectionView, _ indexPath: IndexPath) {
+        // Get the cell from collection and indexpath
+        let cell = collectionView.cellForItem(at: indexPath) as! CalendarViewCell
+        // 1. Check if the selected indexpath is same or not
+        if let hightlightedIndexPath = self.highlightedIndexPath, hightlightedIndexPath == indexPath {
+            // 2. If the indexpath is same then deselect the current highlighted cell and clear the highlightedIndexPath
+            cell.isHighlighted(false)
+            collectionView.deselectItem(at: indexPath, animated: true)
+            highlightedIndexPath = nil
+        } else {
+            // 3. If the indexpath is new then check if any previous highlighted cell is there or not
+            if let previousHighlightedIndexPath = highlightedIndexPath {
+                // 4. Get the previous highlighted cell from the previousHighlightedIndexPath
+                let previousCell = collectionView.cellForItem(at: previousHighlightedIndexPath) as! CalendarViewCell
+                // 5. Deselect the highlighted cell
+                previousCell.isHighlighted(false)
+                collectionView.deselectItem(at: previousHighlightedIndexPath, animated: true)
+            }
+            // 6. Then select the new highlighted cell
+            cell.isHighlighted(true)
+            // 7. Update the highlightedindexpath
+            highlightedIndexPath = indexPath
+        }
     }
 }
