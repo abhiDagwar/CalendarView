@@ -7,27 +7,44 @@
 
 import UIKit
 
+protocol CalendarViewDelegate: AnyObject {
+    func calendarDidSelectDate(_ date: Date)
+}
+
+enum CalendarViewType {
+    case monthly
+    case weekly
+}
+
 class CalendarView: UIView {
-    //PROPERTIES
+    //MARK: - PROPERTIES
+    private let calendarViewHelper = CalendarViewHelper()
+    private var selectedDate = Date()
+    private var daysInView = [String]()
+    private var highlightedIndexPath: IndexPath?
+    
+    weak var delegate: CalendarViewDelegate?
+    
+    private var headerTitle: String = "MONTH NAME"
+    private var viewType: CalendarViewType = .monthly
+    
+    //UI Element
     var headerviewBackgroundColor: UIColor = .red
     var previousBtnImage: UIImage = UIImage(systemName: "arrowshape.left.circle.fill")!
     var nextBtnImage: UIImage = UIImage(systemName: "arrowshape.right.circle.fill")!
-    var headerTitle: String = "MONTH NAME"
-    var collectioViewHeight = 0.0
-    var highlightedIndexPath: IndexPath?
-    
-    //UI Element
     private let headerView =  UIView()
     private let previousButton = UIButton(type: .system)
     private let nextButton = UIButton(type: .system)
     private let headerLabel = UILabel()
     private var collectionView: UICollectionView!
     
+    //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         //setup header view
         setupHeaderView()
         setupCollectionView()
+        setView(for: viewType)
     }
     
     required init?(coder: NSCoder) {
@@ -35,19 +52,20 @@ class CalendarView: UIView {
         //setup header view
         setupHeaderView()
         setupCollectionView()
+        setView(for: viewType)
     }
     
+    //MARK: - Re-Render View
     override func layoutSubviews() {
         super.layoutSubviews()
         // Ensure collectionView has a valid frame size before setting the cell size
         if collectionView.frame.size.width > 0 {
-            collectioViewHeight = collectionView.frame.height
             setupCellView()  // Adjust the cell size when the view's layout changes (e.g., on rotation)
         }
         
     }
     
-    //setup headerview for calendar
+    //MARK: - Setup headerview for calendar
     private func setupHeaderView() {
         //setup a headerview
         headerView.backgroundColor = headerviewBackgroundColor
@@ -99,7 +117,7 @@ class CalendarView: UIView {
         ])
     }
     
-    //setup collectionview for calendar dates and weeks name.
+    //MARK: - Setup collectionview for calendar dates and weeks name.
     private func setupCollectionView() {
         //setup a flow layout
         let layout = UICollectionViewFlowLayout()
@@ -129,6 +147,7 @@ class CalendarView: UIView {
         ])
     }
     
+    //MARK: - Setup Month Cell View
     private func setupCellView() {
         //Get the collectionview layout
         guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {
@@ -155,6 +174,7 @@ class CalendarView: UIView {
         
         // Assign size for cells
         // Asign width and height both the same value if you want to make it square e.g. (width: cellWidth, height: cellWidth)
+        ///If height is equal to cellHeight then as per logic the assigned collection view height is approximately equal to view height. In this case the scroll is not applicable. To make calendar scroll add total cellHeight of rows more than view height. Try cellWidth instead of cellHeight to check.
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         
         layout.invalidateLayout() // Invalidate the layout to apply changes
@@ -166,11 +186,61 @@ class CalendarView: UIView {
         print("Cell Width: \(cellWidth)")
         print("Collection View Height: \(collectionView.frame.height)")
     }
+    // MARK: - Set View (Monthly or Weekly)
+    func setView(for type: CalendarViewType) {
+        viewType = type
+        setDatesForCurrentView()
+    }
     
+    private func setDatesForCurrentView() {
+        daysInView.removeAll()
+        
+        //Check view type. If monthly add monthView else weekView
+        if viewType == .monthly {
+            setMonthView() //Currently working on monthly view only
+        } else {
+            //TODO: -
+            //setWeekView()
+        }
+        
+        collectionView.reloadData()
+    }
+    
+    // MARK: - Set Month View
+    private func setMonthView() {
+        let daysInSelectedMonth = calendarViewHelper.daysInMonth(for: selectedDate)
+        let firstDayOfMonth = calendarViewHelper.firstDayOfMonth(for: selectedDate)
+        let startingSpaces = calendarViewHelper.weekDay(date: firstDayOfMonth)
+        
+        ///Check starting spaces and total days in current month. If it is less than equal to 35 then add 5 rows else add 6 rows
+        let daysCount = startingSpaces + daysInSelectedMonth <= 35 ? 35 : 42
+        var count = 1
+        while count <= daysCount {  // 42 cells for a 6x7 grid
+            if count <= startingSpaces || count - startingSpaces > daysInSelectedMonth {
+                daysInView.append("")
+            } else {
+                daysInView.append(String(count - startingSpaces))
+            }
+            count += 1
+        }
+        
+        updateHeaderLabel()
+    }
+    
+    // MARK: - Update Header Label
+    private func updateHeaderLabel() {
+        let monthString = calendarViewHelper.monthString(date: selectedDate)
+        let yearString = calendarViewHelper.yearString(date: selectedDate)
+        headerTitle = "\(monthString) \(yearString)"
+        headerLabel.text = headerTitle
+    }
+    
+    //MARK: - Actions/Selectors
+    ///Header view button to select previous month
     @objc private func previousButtonTapped() {
         print("Previous button tapped...")
     }
-    
+    ///Header view button to select next month
     @objc private func nextButtonTapped() {
         print("Next button tapped...")
     }
@@ -192,26 +262,46 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
 
 extension CalendarView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 42
+        return daysInView.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath) as! CalendarViewCell
         
         // Example: Configure the cell with the date and selection state
-        let date = String(indexPath.item + 1) // Dummy data
-        // Configure the cell
-        cell.configure(date: date)
+        let date = daysInView[indexPath.item]
+        let isCurrentDay = checkIfCurrentDay(for: indexPath)
+        cell.configure(date: date, isCurrentDay: isCurrentDay)
 
         return cell
     }
+    
+    // MARK: - Check Current Day
+    private func checkIfCurrentDay(for indexPath: IndexPath) -> Bool {
+        let currentDate = Date()
+        let currentMonthStr = calendarViewHelper.monthString(date: currentDate)
+        let selectedMonthStr = calendarViewHelper.monthString(date: selectedDate)
+        let currentDayStr = calendarViewHelper.dayString(date: currentDate)
+        
+        let dayStr = daysInView[indexPath.item]
+        return (selectedMonthStr == currentMonthStr && currentDayStr == dayStr)
+    }
+
 }
 
 extension CalendarView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Selected date: ---\(indexPath.item + 1)")
+        let dayStr = daysInView[indexPath.item]
+        guard !dayStr.isEmpty, let _ = Int(dayStr) else { return }
+        
+        // Highlight the cell
         highlightCellFor(collectionView, indexPath)
+        
+        // Notify the delegate
+        if let selectedDate = calendarViewHelper.createDate(from: dayStr, monthNameString: calendarViewHelper.monthString(date: selectedDate), yearString: calendarViewHelper.yearString(date: selectedDate)) {
+            delegate?.calendarDidSelectDate(selectedDate)
+        }
     }
     
     private func highlightCellFor(_ collectionView: UICollectionView, _ indexPath: IndexPath) {
@@ -220,7 +310,8 @@ extension CalendarView: UICollectionViewDelegate {
         // 1. Check if the selected indexpath is same or not
         if let hightlightedIndexPath = self.highlightedIndexPath, hightlightedIndexPath == indexPath {
             // 2. If the indexpath is same then deselect the current highlighted cell and clear the highlightedIndexPath
-            cell.isHighlighted(false)
+            let isCurrentDay = checkIfCurrentDay(for: indexPath)
+            cell.isHighlighted(false, isCurrentDay: isCurrentDay)
             collectionView.deselectItem(at: indexPath, animated: true)
             highlightedIndexPath = nil
         } else {
@@ -228,12 +319,14 @@ extension CalendarView: UICollectionViewDelegate {
             if let previousHighlightedIndexPath = highlightedIndexPath {
                 // 4. Get the previous highlighted cell from the previousHighlightedIndexPath
                 let previousCell = collectionView.cellForItem(at: previousHighlightedIndexPath) as! CalendarViewCell
+                let isCurrentDay = checkIfCurrentDay(for: previousHighlightedIndexPath)
                 // 5. Deselect the highlighted cell
-                previousCell.isHighlighted(false)
+                previousCell.isHighlighted(false, isCurrentDay: isCurrentDay)
                 collectionView.deselectItem(at: previousHighlightedIndexPath, animated: true)
             }
+            let isCurrentDay = checkIfCurrentDay(for: indexPath)
             // 6. Then select the new highlighted cell
-            cell.isHighlighted(true)
+            cell.isHighlighted(true, isCurrentDay: isCurrentDay)
             // 7. Update the highlightedindexpath
             highlightedIndexPath = indexPath
         }

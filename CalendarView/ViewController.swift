@@ -23,6 +23,8 @@ class ViewController: UIViewController {
     func setupCalendarView() {
         //Initialize the calendarview
         calendarView = CalendarView()
+        // Set delegate to handle date selection
+        calendarView.delegate = self
         //Set background color
         calendarView.backgroundColor = .green
         //Add to the viewcontroller
@@ -32,9 +34,9 @@ class ViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
             calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.58)
+            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28)
         ])
     }
     
@@ -54,3 +56,10 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController: CalendarViewDelegate {
+    // Handle the selection event from CalendarView
+    func calendarDidSelectDate(_ date: Date) {
+        print("Selected date: \(date)")
+        // Handle date selection (e.g., show events or further details for the selected date)
+    }
+}

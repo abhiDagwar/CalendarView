@@ -17,6 +17,16 @@ class CalendarViewCell: UICollectionViewCell {
         return label
     }()
     
+    // Square background view for the today's date
+    private let squareView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear // Initially transparent
+        view.layer.cornerRadius = 4  // Will be adjusted dynamically
+        view.layer.masksToBounds = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     // Circle background view for the selected date
     private let circleView: UIView = {
         let view = UIView()
@@ -41,10 +51,20 @@ class CalendarViewCell: UICollectionViewCell {
     }
     
     fileprivate func setupCell() {
+        // Add the squareView to the cell's content view
+        super.addSubview(squareView)
         // Add the circleView to the cell's content view
         super.addSubview(circleView)
         // Add the date label on top of the circleView
         super.addSubview(titleLabel)
+        
+        // Set up constraints for the squareView
+        NSLayoutConstraint.activate([
+            squareView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            squareView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            squareView.widthAnchor.constraint(equalTo: titleLabel.widthAnchor, constant: 20), // Adjust width dynamically
+            squareView.heightAnchor.constraint(equalTo: circleView.widthAnchor) // Keep it square
+        ])
         
         // Set up constraints for the circleView
         NSLayoutConstraint.activate([
@@ -54,6 +74,7 @@ class CalendarViewCell: UICollectionViewCell {
             circleView.heightAnchor.constraint(equalTo: circleView.widthAnchor) // Keep it square
         ])
         
+        // Setup constraints for the date label(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
@@ -62,17 +83,36 @@ class CalendarViewCell: UICollectionViewCell {
     }
     
     // Configure the cell with a date and whether it's selected
-    func configure(date: String) {
+    func configure(date: String, isCurrentDay: Bool) {
+        
+        if date.isEmpty {
+            isUserInteractionEnabled = false
+        }
+        
         titleLabel.text = date
+        
+        if isCurrentDay {
+            squareView.backgroundColor = .systemGray  // Current day in gray
+            titleLabel.textColor = .white
+        } else {
+            squareView.backgroundColor = .clear
+            titleLabel.textColor = .black
+        }
     }
     
-    func isHighlighted(_ highlight: Bool) {
+    func isHighlighted(_ highlight: Bool, isCurrentDay: Bool) {
         if highlight {
             circleView.backgroundColor = .red  // Highlighted color
             titleLabel.textColor = .white       // Text color when selected
+            if isCurrentDay {
+                squareView.backgroundColor = .clear  // Current day in gray
+            }
         } else {
             circleView.backgroundColor = .clear // Default transparent
             titleLabel.textColor = .black        // Default text color
+            if isCurrentDay {
+                squareView.backgroundColor = .systemGray  // Current day in gray
+            }
         }
     }
     
