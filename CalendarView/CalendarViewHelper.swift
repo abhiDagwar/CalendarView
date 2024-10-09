@@ -70,7 +70,26 @@ class CalendarViewHelper {
     func createDate(from day: String, monthNameString: String, yearString: String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM yyyy"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Set timezone to UTC
         let dateString = "\(day) \(monthNameString) \(yearString)"
         return dateFormatter.date(from: dateString)
+    }
+    
+    //MARK: - Get the Date in String format
+    func createFormattedDateString(from day: String, monthNameString: String, yearString: String) -> String? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMMM yyyy"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Set timezone to UTC
+        
+        let dateString = "\(day) \(monthNameString) \(yearString)"
+        
+        // Convert string to Date object
+        if let date = dateFormatter.date(from: dateString) {
+            // Format Date object to "yyyy-MM-dd"
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            return dateFormatter.string(from: date)
+        }
+        
+        return nil
     }
 }

@@ -1,0 +1,23 @@
+{
+  "events": [
+    {
+      "eventID": 1,
+      "title": "Meeting with Team",
+      "date": "2024-10-12",
+      "eventType": "work"
+    },
+    {
+      "eventID": 2,
+      "title": "Doctor Appointment",
+      "date": "2024-10-18",
+      "eventType": "personal"
+    },
+    {
+      "eventID": 3,
+      "title": "Gym Session",
+      "date": "2024-10-22",
+      "eventType": "fitness"
+    }
+  ]
+}
+

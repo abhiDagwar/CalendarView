@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CalendarViewDelegate: AnyObject {
-    func calendarDidSelectDate(_ date: Date)
+    func calendarDidSelectDate(_ date: String, for event: CalendarEvent?)
 }
 
 enum CalendarViewType {
@@ -22,6 +22,7 @@ class CalendarView: UIView {
     private var selectedDate = Date()
     private var daysInView = [String]()
     private var highlightedIndexPath: IndexPath?
+    private var calendarViewModel = CalendarViewModel()
     
     weak var delegate: CalendarViewDelegate?
     
@@ -41,6 +42,7 @@ class CalendarView: UIView {
     //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
+        calendarViewModel.loadEvents() // Load events from JSON
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -49,6 +51,7 @@ class CalendarView: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        calendarViewModel.loadEvents() // Load events from JSON
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -268,11 +271,20 @@ extension CalendarView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath) as! CalendarViewCell
         
-        // Example: Configure the cell with the date and selection state
+        // Example: Configure the cell with the date, event and selection state
         let date = daysInView[indexPath.item]
         let isCurrentDay = checkIfCurrentDay(for: indexPath)
-        cell.configure(date: date, isCurrentDay: isCurrentDay)
-
+        
+        let formattedDate = calendarViewHelper.createFormattedDateString(from: date, monthNameString: calendarViewHelper.monthString(date: selectedDate), yearString: calendarViewHelper.yearString(date: selectedDate))
+        // Get the event for the specific date
+        if let formattedDate = formattedDate {
+            // Get the event for the specific date
+            let event = calendarViewModel.eventForDate(formattedDate)
+            cell.configure(date: date, isCurrentDay: isCurrentDay, event: event)
+        } else {
+            cell.configure(date: date, isCurrentDay: isCurrentDay)
+        }
+        
         return cell
     }
     
@@ -299,8 +311,10 @@ extension CalendarView: UICollectionViewDelegate {
         highlightCellFor(collectionView, indexPath)
         
         // Notify the delegate
-        if let selectedDate = calendarViewHelper.createDate(from: dayStr, monthNameString: calendarViewHelper.monthString(date: selectedDate), yearString: calendarViewHelper.yearString(date: selectedDate)) {
-            delegate?.calendarDidSelectDate(selectedDate)
+        if let formattedDate = calendarViewHelper.createFormattedDateString(from: dayStr, monthNameString: calendarViewHelper.monthString(date: selectedDate), yearString: calendarViewHelper.yearString(date: selectedDate)) {
+            // Get the event for the specific date
+            let event = calendarViewModel.eventForDate(formattedDate)
+            delegate?.calendarDidSelectDate(formattedDate, for: event)
         }
     }
     

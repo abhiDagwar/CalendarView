@@ -36,7 +36,7 @@ class ViewController: UIViewController {
             calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
             calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28)
+            calendarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.58)
         ])
     }
     
@@ -58,8 +58,19 @@ class ViewController: UIViewController {
 
 extension ViewController: CalendarViewDelegate {
     // Handle the selection event from CalendarView
-    func calendarDidSelectDate(_ date: Date) {
-        print("Selected date: \(date)")
+    func calendarDidSelectDate(_ date: String, for event: CalendarEvent?) {
         // Handle date selection (e.g., show events or further details for the selected date)
+        if let event {
+            showEventDetails(event: event)
+        }
+    }
+    
+    
+    private func showEventDetails(event: CalendarEvent) {
+        let alert = UIAlertController(title: event.title, message: event.eventType, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default)
+        alert.addAction(okAction)
+        
+        present(alert, animated: true, completion: nil)
     }
 }

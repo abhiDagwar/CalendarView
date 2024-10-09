@@ -37,6 +37,15 @@ class CalendarViewCell: UICollectionViewCell {
         return view
     }()
     
+    //Event Indicator
+    private let eventIndicatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.layer.cornerRadius = 10
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     //Initialize cell
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -57,6 +66,8 @@ class CalendarViewCell: UICollectionViewCell {
         super.addSubview(circleView)
         // Add the date label on top of the circleView
         super.addSubview(titleLabel)
+        //Add the event indicator to the corner of cell's content view
+        super.addSubview(eventIndicatorView)
         
         // Set up constraints for the squareView
         NSLayoutConstraint.activate([
@@ -80,10 +91,18 @@ class CalendarViewCell: UICollectionViewCell {
             titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
+        
+        // Set up constraints for the event indicator view
+        NSLayoutConstraint.activate([
+            eventIndicatorView.widthAnchor.constraint(equalToConstant: 10),
+            eventIndicatorView.heightAnchor.constraint(equalToConstant: 10),
+            eventIndicatorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            eventIndicatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5)
+        ])
     }
     
     // Configure the cell with a date and whether it's selected
-    func configure(date: String, isCurrentDay: Bool) {
+    func configure(date: String, isCurrentDay: Bool, event: CalendarEvent? = nil) {
         
         if date.isEmpty {
             isUserInteractionEnabled = false
@@ -97,6 +116,22 @@ class CalendarViewCell: UICollectionViewCell {
         } else {
             squareView.backgroundColor = .clear
             titleLabel.textColor = .black
+        }
+        
+        // Set event color
+        if let event = event {
+            switch event.eventType {
+            case "work":
+                eventIndicatorView.backgroundColor = .blue
+            case "personal":
+                eventIndicatorView.backgroundColor = .brown
+            case "fitness":
+                eventIndicatorView.backgroundColor = .red
+            default:
+                eventIndicatorView.backgroundColor = .clear
+            }
+        } else {
+            eventIndicatorView.backgroundColor = .clear
         }
     }
     
