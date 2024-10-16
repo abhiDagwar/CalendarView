@@ -32,6 +32,12 @@ class CalendarViewModel {
         }
     }
     
+    // Method to set events from an external source, like a ViewController
+    func setEvents(_ events: [CalendarEvent]) {
+        self.events = events
+    }
+    
+    // Method to get an event for a specific date
     func eventForDate(_ date: String) -> CalendarEvent? {
         return events.first { $0.date == date }
     }

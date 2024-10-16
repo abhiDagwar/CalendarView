@@ -12,12 +12,19 @@ class ViewController: UIViewController {
     //Calendar instance
     var calendarView: CalendarView!
     
+    var calendarViewModel = CalendarViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         //setup calendarview
         setupCalendarView()
         setupFooterView()
+        // Load events and set them in the view model
+        calendarViewModel.loadEvents()
+        
+        // Set the view model to the calendar view
+        calendarView.setViewModel(calendarViewModel)
     }
     
     func setupCalendarView() {

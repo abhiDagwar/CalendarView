@@ -22,7 +22,7 @@ class CalendarView: UIView {
     private var selectedDate = Date()
     private var daysInView = [String]()
     private var highlightedIndexPath: IndexPath?
-    private var calendarViewModel = CalendarViewModel()
+    private var calendarViewModel = CalendarViewModel() // CalendarViewModel instance
     
     weak var delegate: CalendarViewDelegate?
     
@@ -42,7 +42,7 @@ class CalendarView: UIView {
     //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        calendarViewModel.loadEvents() // Load events from JSON
+        checkMonthAvailability(startMonth: -1, endMonth: 0)
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -51,7 +51,7 @@ class CalendarView: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        calendarViewModel.loadEvents() // Load events from JSON
+        checkMonthAvailability(startMonth: -1, endMonth: 0)
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -206,6 +206,8 @@ class CalendarView: UIView {
             //setWeekView()
         }
         
+        updateHeaderLabel()
+        
         collectionView.reloadData()
     }
     
@@ -226,10 +228,18 @@ class CalendarView: UIView {
             }
             count += 1
         }
-        
-        updateHeaderLabel()
     }
     
+    // MARK: - Method to set the view model
+    func setViewModel(_ viewModel: CalendarViewModel) {
+        self.calendarViewModel = viewModel
+    }
+    
+    // MARK: - Method to get an event for a specific date
+    func getEventForDate(_ date: String) -> CalendarEvent? {
+        return calendarViewModel.eventForDate(date)
+    }
+
     // MARK: - Update Header Label
     private func updateHeaderLabel() {
         let monthString = calendarViewHelper.monthString(date: selectedDate)
@@ -238,14 +248,38 @@ class CalendarView: UIView {
         headerLabel.text = headerTitle
     }
     
+    // MARK: - Add this function to display a range of months (e.g.: if you want to display only current and previous month then add -1 to startMonth to display previous month and 0 to endMonth to hide next month.)
+    func checkMonthAvailability(startMonth: Int, endMonth: Int) {
+        let currentDate = Date()
+        let selectedMonthStr = calendarViewHelper.monthString(date: selectedDate)
+        
+        // Calculate the boundary months based on the input
+        let startMonthDate = calendarViewHelper.nextMonth(date: currentDate, by: startMonth)
+        let endMonthDate = calendarViewHelper.nextMonth(date: currentDate, by: endMonth)
+        
+        let startMonthStr = calendarViewHelper.monthString(date: startMonthDate)
+        let endMonthStr = calendarViewHelper.monthString(date: endMonthDate)
+        
+        // Disable or enable the buttons based on the selected month
+        previousButton.isEnabled = selectedMonthStr != startMonthStr
+        nextButton.isEnabled = selectedMonthStr != endMonthStr
+    }
+    
     //MARK: - Actions/Selectors
     ///Header view button to select previous month
     @objc private func previousButtonTapped() {
         print("Previous button tapped...")
+        selectedDate = calendarViewHelper.previousMonth(date: selectedDate)
+        setView(for: viewType)
+        checkMonthAvailability(startMonth: -1, endMonth: 0)
     }
+
     ///Header view button to select next month
     @objc private func nextButtonTapped() {
         print("Next button tapped...")
+        selectedDate = calendarViewHelper.nextMonth(date: selectedDate)
+        setView(for: viewType)
+        checkMonthAvailability(startMonth: -1, endMonth: 0)
     }
 }
 
@@ -271,6 +305,8 @@ extension CalendarView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarViewCell", for: indexPath) as! CalendarViewCell
         
+        cell.setUpViewInit()
+        
         // Example: Configure the cell with the date, event and selection state
         let date = daysInView[indexPath.item]
         let isCurrentDay = checkIfCurrentDay(for: indexPath)
@@ -279,7 +315,7 @@ extension CalendarView: UICollectionViewDataSource {
         // Get the event for the specific date
         if let formattedDate = formattedDate {
             // Get the event for the specific date
-            let event = calendarViewModel.eventForDate(formattedDate)
+            let event = getEventForDate(formattedDate)
             cell.configure(date: date, isCurrentDay: isCurrentDay, event: event)
         } else {
             cell.configure(date: date, isCurrentDay: isCurrentDay)
@@ -319,30 +355,31 @@ extension CalendarView: UICollectionViewDelegate {
     }
     
     private func highlightCellFor(_ collectionView: UICollectionView, _ indexPath: IndexPath) {
-        // Get the cell from collection and indexpath
-        let cell = collectionView.cellForItem(at: indexPath) as! CalendarViewCell
-        // 1. Check if the selected indexpath is same or not
-        if let hightlightedIndexPath = self.highlightedIndexPath, hightlightedIndexPath == indexPath {
-            // 2. If the indexpath is same then deselect the current highlighted cell and clear the highlightedIndexPath
-            let isCurrentDay = checkIfCurrentDay(for: indexPath)
-            cell.isHighlighted(false, isCurrentDay: isCurrentDay)
-            collectionView.deselectItem(at: indexPath, animated: true)
-            highlightedIndexPath = nil
+        print("Hightlighting cell for \(indexPath.item)")
+        // Check if the tapped cell is the one that's currently highlighted
+        if let highlightedIndexPath = highlightedIndexPath, highlightedIndexPath == indexPath {
+            // Deselect the cell and clear the highlight
+            let currentCell = collectionView.cellForItem(at: highlightedIndexPath) as? CalendarViewCell
+            let isCurrentDay = checkIfCurrentDay(for: highlightedIndexPath)
+            currentCell?.unhighlightCell(isCurrentDay: isCurrentDay)
+            collectionView.deselectItem(at: highlightedIndexPath, animated: true)
+            self.highlightedIndexPath = nil // Reset the highlighted index path
         } else {
-            // 3. If the indexpath is new then check if any previous highlighted cell is there or not
-            if let previousHighlightedIndexPath = highlightedIndexPath {
-                // 4. Get the previous highlighted cell from the previousHighlightedIndexPath
-                let previousCell = collectionView.cellForItem(at: previousHighlightedIndexPath) as! CalendarViewCell
-                let isCurrentDay = checkIfCurrentDay(for: previousHighlightedIndexPath)
-                // 5. Deselect the highlighted cell
-                previousCell.isHighlighted(false, isCurrentDay: isCurrentDay)
-                collectionView.deselectItem(at: previousHighlightedIndexPath, animated: true)
+            // If there's a previously highlighted cell, unhighlight it
+            if let highlightedIndexPath = highlightedIndexPath {
+                let previousCell = collectionView.cellForItem(at: highlightedIndexPath) as? CalendarViewCell
+                let isCurrentDay = checkIfCurrentDay(for: highlightedIndexPath)
+                previousCell?.unhighlightCell(isCurrentDay: isCurrentDay)
+                collectionView.deselectItem(at: highlightedIndexPath, animated: true) // Deselect the previously selected cell
             }
+            
+            // Highlight the tapped cell
+            let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarViewCell
             let isCurrentDay = checkIfCurrentDay(for: indexPath)
-            // 6. Then select the new highlighted cell
-            cell.isHighlighted(true, isCurrentDay: isCurrentDay)
-            // 7. Update the highlightedindexpath
-            highlightedIndexPath = indexPath
+            currentCell?.highlightCell(isCurrentDay: isCurrentDay)
+            
+            // Update the highlighted index path
+            self.highlightedIndexPath = indexPath
         }
     }
 }

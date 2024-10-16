@@ -41,9 +41,20 @@ class CalendarViewCell: UICollectionViewCell {
     private let eventIndicatorView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
-        view.layer.cornerRadius = 10
+        view.layer.cornerRadius = 5
+        view.layer.masksToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    //Event Indicator
+    private let healthIndicatorView: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 10, weight: .medium)
+        label.textColor = .clear
+        label.text = "H"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     //Initialize cell
@@ -68,6 +79,8 @@ class CalendarViewCell: UICollectionViewCell {
         super.addSubview(titleLabel)
         //Add the event indicator to the corner of cell's content view
         super.addSubview(eventIndicatorView)
+        // Add health indicator
+        super.addSubview(healthIndicatorView)
         
         // Set up constraints for the squareView
         NSLayoutConstraint.activate([
@@ -99,6 +112,19 @@ class CalendarViewCell: UICollectionViewCell {
             eventIndicatorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
             eventIndicatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5)
         ])
+        
+        NSLayoutConstraint.activate([
+            healthIndicatorView.widthAnchor.constraint(equalToConstant: 10),
+            healthIndicatorView.heightAnchor.constraint(equalToConstant: 10),
+            healthIndicatorView.topAnchor.constraint(equalTo: eventIndicatorView.bottomAnchor, constant: 5),
+            healthIndicatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+        ])
+    }
+    
+    func setUpViewInit() {
+        // Example: Clear the background color of only UILabels within the view hierarchy
+        self.clearBackgroundColor(of: circleView)
+        isUserInteractionEnabled = true
     }
     
     // Configure the cell with a date and whether it's selected
@@ -119,19 +145,42 @@ class CalendarViewCell: UICollectionViewCell {
         }
         
         // Set event color
+        // work, personal, education, social, family, health, and community
+        // leisure, recreation, and celebrations
         if let event = event {
             switch event.eventType {
-            case "work":
+            case "Work", "Recreation", "Celebrations":
                 eventIndicatorView.backgroundColor = .blue
-            case "personal":
+            case "Personal", "Social", "Family", "Community":
                 eventIndicatorView.backgroundColor = .brown
-            case "fitness":
+            case "Education", "Leisure":
                 eventIndicatorView.backgroundColor = .red
+            case "Health":
+                healthIndicatorView.textColor = .orange
             default:
                 eventIndicatorView.backgroundColor = .clear
             }
         } else {
             eventIndicatorView.backgroundColor = .clear
+            healthIndicatorView.textColor = .clear
+        }
+    }
+    
+    // Function to highlight the cell
+    func highlightCell(isCurrentDay: Bool) {
+        circleView.backgroundColor = .red  // Highlighted color
+        titleLabel.textColor = .white       // Text color when selected
+        if isCurrentDay {
+            squareView.backgroundColor = .clear  // Current day in gray
+        }
+    }
+        
+        // Function to unhighlight the cell
+    func unhighlightCell(isCurrentDay: Bool) {
+        circleView.backgroundColor = .clear // Default transparent
+        titleLabel.textColor = .black        // Default text color
+        if isCurrentDay {
+            squareView.backgroundColor = .systemGray  // Current day in gray
         }
     }
     
@@ -158,4 +207,15 @@ class CalendarViewCell: UICollectionViewCell {
         circleView.layer.cornerRadius = circleView.frame.size.width / 2
     }
     
+}
+
+extension UIView {
+    func clearBackgroundColor(of view: UIView) {
+        if self == view {
+            self.backgroundColor = .clear
+        }
+        for subview in subviews {
+            subview.clearBackgroundColor(of: view) // Recursively check all subviews
+        }
+    }
 }

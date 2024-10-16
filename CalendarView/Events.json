@@ -1,23 +1,112 @@
 {
-  "events": [
-    {
-      "eventID": 1,
-      "title": "Meeting with Team",
-      "date": "2024-10-12",
-      "eventType": "work"
-    },
-    {
-      "eventID": 2,
-      "title": "Doctor Appointment",
-      "date": "2024-10-18",
-      "eventType": "personal"
-    },
-    {
-      "eventID": 3,
-      "title": "Gym Session",
-      "date": "2024-10-22",
-      "eventType": "fitness"
-    }
-  ]
+    "events": [
+        {
+            "eventID": 1,
+            "title": "Team Meeting",
+            "date": "2024-09-05",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 2,
+            "title": "Doctor's Appointment",
+            "date": "2024-09-07",
+            "eventType": "Personal"
+        },
+        {
+            "eventID": 3,
+            "title": "Project Deadline",
+            "date": "2024-09-10",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 4,
+            "title": "Workshop",
+            "date": "2024-09-12",
+            "eventType": "Education"
+        },
+        {
+            "eventID": 5,
+            "title": "Team Outing",
+            "date": "2024-09-14",
+            "eventType": "Social"
+        },
+        {
+            "eventID": 6,
+            "title": "Conference Call",
+            "date": "2024-09-16",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 7,
+            "title": "Family Gathering",
+            "date": "2024-09-18",
+            "eventType": "Family"
+        },
+        {
+            "eventID": 8,
+            "title": "Fitness Class",
+            "date": "2024-09-20",
+            "eventType": "Health"
+        },
+        {
+            "eventID": 9,
+            "title": "Volunteer Event",
+            "date": "2024-09-25",
+            "eventType": "Community"
+        },
+        {
+            "eventID": 10,
+            "title": "Conference",
+            "date": "2024-10-03",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 11,
+            "title": "Birthday Party",
+            "date": "2024-10-05",
+            "eventType": "Social"
+        },
+        {
+            "eventID": 12,
+            "title": "Dentist Appointment",
+            "date": "2024-10-08",
+            "eventType": "Health"
+        },
+        {
+            "eventID": 13,
+            "title": "Project Launch",
+            "date": "2024-10-12",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 14,
+            "title": "Vacation",
+            "date": "2024-10-15",
+            "eventType": "Leisure"
+        },
+        {
+            "eventID": 15,
+            "title": "Sports Event",
+            "date": "2024-10-18",
+            "eventType": "Recreation"
+        },
+        {
+            "eventID": 16,
+            "title": "Client Meeting",
+            "date": "2024-10-21",
+            "eventType": "Work"
+        },
+        {
+            "eventID": 17,
+            "title": "Halloween Party",
+            "date": "2024-10-31",
+            "eventType": "Social"
+        },
+        {
+            "eventID": 18,
+            "title": "Client Meeting",
+            "date": "2024-10-08",
+            "eventType": "Work"
+        }
+    ]
 }
-

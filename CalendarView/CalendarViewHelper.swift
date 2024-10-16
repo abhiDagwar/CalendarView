@@ -92,4 +92,14 @@ class CalendarViewHelper {
         
         return nil
     }
+    
+    // MARK: - Function to add months with a custom offset (default is 1)
+    func nextMonth(date: Date, by offset: Int = 1) -> Date {
+        return calendar.date(byAdding: .month, value: offset, to: date)!
+    }
+    
+    // MARK: - Function to subtract months with a custom offset (default is 1)
+    func previousMonth(date: Date, by offset: Int = 1) -> Date {
+        return calendar.date(byAdding: .month, value: -offset, to: date)!
+    }
 }
