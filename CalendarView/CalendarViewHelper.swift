@@ -22,7 +22,7 @@ class CalendarViewHelper {
     func firstDayOfMonth(for date: Date) -> Date {
         calendar.startOfDay(for: date)
     }
-        
+    
     // MARK: - Weekday of the First Day in the Month
     func weekDay(date: Date) -> Int {
         return calendar.component(.weekday, from: date) - 1 // Sunday = 1, subtract 1 for 0-indexing
@@ -101,5 +101,20 @@ class CalendarViewHelper {
     // MARK: - Function to subtract months with a custom offset (default is 1)
     func previousMonth(date: Date, by offset: Int = 1) -> Date {
         return calendar.date(byAdding: .month, value: -offset, to: date)!
+    }
+    
+    // MARK: - Add this function to display a range of months (e.g.: if you want to display only current and previous month then add -1 to startMonth to display previous month and 0 to endMonth to hide next month.)
+    func checkMonthAvailability(startMonth: Int, endMonth: Int, selectedDate: Date) -> (previousButtonEnabled: Bool, nextButtonEnabled: Bool) {
+        let currentDate = Date()
+        
+        // Calculate the boundary months based on the input
+        let startMonthDate = nextMonth(date: currentDate, by: startMonth)
+        let endMonthDate = nextMonth(date: currentDate, by: endMonth)
+        
+        // Enable or disable the buttons based on whether the selected date is within the boundaries
+        let previousMonthEnabled = selectedDate > startMonthDate
+        let nextMonthEnabled = selectedDate < endMonthDate
+        
+        return (previousMonthEnabled, nextMonthEnabled)
     }
 }

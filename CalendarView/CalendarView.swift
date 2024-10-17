@@ -38,11 +38,11 @@ class CalendarView: UIView {
     private let nextButton = UIButton(type: .system)
     private let headerLabel = UILabel()
     private var collectionView: UICollectionView!
-    
+        
     //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        checkMonthAvailability(startMonth: -1, endMonth: 0)
+        updateMonthAvailability()
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -51,7 +51,7 @@ class CalendarView: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        checkMonthAvailability(startMonth: -1, endMonth: 0)
+        updateMonthAvailability()
         //setup header view
         setupHeaderView()
         setupCollectionView()
@@ -248,30 +248,20 @@ class CalendarView: UIView {
         headerLabel.text = headerTitle
     }
     
-    // MARK: - Add this function to display a range of months (e.g.: if you want to display only current and previous month then add -1 to startMonth to display previous month and 0 to endMonth to hide next month.)
-    func checkMonthAvailability(startMonth: Int, endMonth: Int) {
-        let currentDate = Date()
-        let selectedMonthStr = calendarViewHelper.monthString(date: selectedDate)
-        
-        // Calculate the boundary months based on the input
-        let startMonthDate = calendarViewHelper.nextMonth(date: currentDate, by: startMonth)
-        let endMonthDate = calendarViewHelper.nextMonth(date: currentDate, by: endMonth)
-        
-        let startMonthStr = calendarViewHelper.monthString(date: startMonthDate)
-        let endMonthStr = calendarViewHelper.monthString(date: endMonthDate)
-        
-        // Disable or enable the buttons based on the selected month
-        previousButton.isEnabled = selectedMonthStr != startMonthStr
-        nextButton.isEnabled = selectedMonthStr != endMonthStr
+    // MARK: - Method to update button states
+    func updateMonthAvailability() {
+        let availability = calendarViewHelper.checkMonthAvailability(startMonth: -1, endMonth: -1, selectedDate: selectedDate)
+        previousButton.isEnabled = availability.previousButtonEnabled
+        nextButton.isEnabled = availability.nextButtonEnabled
     }
-    
+
     //MARK: - Actions/Selectors
     ///Header view button to select previous month
     @objc private func previousButtonTapped() {
         print("Previous button tapped...")
         selectedDate = calendarViewHelper.previousMonth(date: selectedDate)
         setView(for: viewType)
-        checkMonthAvailability(startMonth: -1, endMonth: 0)
+        updateMonthAvailability()
     }
 
     ///Header view button to select next month
@@ -279,7 +269,7 @@ class CalendarView: UIView {
         print("Next button tapped...")
         selectedDate = calendarViewHelper.nextMonth(date: selectedDate)
         setView(for: viewType)
-        checkMonthAvailability(startMonth: -1, endMonth: 0)
+        updateMonthAvailability()
     }
 }
 
