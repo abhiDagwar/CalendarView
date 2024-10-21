@@ -25,7 +25,23 @@ class CalendarViewHelper {
     
     // MARK: - Weekday of the First Day in the Month
     func weekDay(date: Date) -> Int {
-        return calendar.component(.weekday, from: date) - 1 // Sunday = 1, subtract 1 for 0-indexing
+        /// 1. ``calendar.component(.weekday, from: date)`` returns values from 1 (Sunday) to 7 (Saturday).
+        /// 2. To shift the week so that Monday is the first day:
+        ///     We add 7 to the original value to avoid negative numbers.
+        ///     We take the result modulo 7, which wraps it around to the correct range.
+        ///
+        /// **The final mapping would look like this:**
+
+        /// * - Sunday (1) becomes 0
+        /// * - Monday (2) becomes 1
+        /// * - Tuesday (3) becomes 2
+        /// * - ...
+        /// * - Saturday (7) becomes 6
+
+
+        let weekday = calendar.component(.weekday, from: date)
+        // Convert the weekday to a zero-based index: 0 for Sunday, 1 for Monday, etc.
+        return (weekday + 7) % 7
     }
     
     // MARK: - Get Month String

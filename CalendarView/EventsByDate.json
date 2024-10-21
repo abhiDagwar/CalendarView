@@ -1,0 +1,88 @@
+{
+    "eventsByDate": {
+        "2024-09-05": [
+            {
+                "eventID": 1,
+                "title": "Team Meeting",
+                "eventType": "Work"
+            },
+            {
+                "eventID": 2,
+                "title": "Client Call",
+                "eventType": "Work"
+            }
+        ],
+        "2024-09-07": [
+            {
+                "eventID": 3,
+                "title": "Doctor's Appointment",
+                "eventType": "Personal"
+            }
+        ],
+        "2024-09-10": [
+            {
+                "eventID": 4,
+                "title": "Project Deadline",
+                "eventType": "Work"
+            },
+            {
+                "eventID": 5,
+                "title": "Team Workshop",
+                "eventType": "Work"
+            }
+        ],
+        "2024-09-18": [
+            {
+                "eventID": 6,
+                "title": "Family Gathering",
+                "eventType": "Family"
+            }
+        ],
+        "2024-09-25": [
+            {
+                "eventID": 7,
+                "title": "Volunteer Event",
+                "eventType": "Community"
+            }
+        ],
+        "2024-10-03": [
+            {
+                "eventID": 8,
+                "title": "Conference",
+                "eventType": "Work"
+            }
+        ],
+        "2024-10-05": [
+            {
+                "eventID": 9,
+                "title": "Birthday Party",
+                "eventType": "Social"
+            },
+            {
+                "eventID": 10,
+                "title": "Fitness Class",
+                "eventType": "Health"
+            }
+        ],
+        "2024-10-15": [
+            {
+                "eventID": 11,
+                "title": "Vacation",
+                "eventType": "Leisure"
+            }
+        ],
+        "2024-10-31": [
+            {
+                "eventID": 12,
+                "title": "Halloween Party",
+                "eventType": "Social"
+            },
+            {
+                "eventID": 13,
+                "title": "Costume Contest",
+                "eventType": "Social"
+            }
+        ]
+    }
+}
+

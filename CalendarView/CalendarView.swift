@@ -213,18 +213,21 @@ class CalendarView: UIView {
     
     // MARK: - Set Month View
     private func setMonthView() {
+        daysInView.removeAll()  // Clear the previous month view
+        
         let daysInSelectedMonth = calendarViewHelper.daysInMonth(for: selectedDate)
         let firstDayOfMonth = calendarViewHelper.firstDayOfMonth(for: selectedDate)
         let startingSpaces = calendarViewHelper.weekDay(date: firstDayOfMonth)
         
-        ///Check starting spaces and total days in current month. If it is less than equal to 35 then add 5 rows else add 6 rows
+        // Check if 5 rows are sufficient or if 6 rows are needed
         let daysCount = startingSpaces + daysInSelectedMonth <= 35 ? 35 : 42
         var count = 1
-        while count <= daysCount {  // 42 cells for a 6x7 grid
+        
+        while count <= daysCount {  // Total of 42 cells for a 6x7 grid
             if count <= startingSpaces || count - startingSpaces > daysInSelectedMonth {
-                daysInView.append("")
+                daysInView.append("")  // Empty cells before the first day and after the last day
             } else {
-                daysInView.append(String(count - startingSpaces))
+                daysInView.append(String(count - startingSpaces))  // Actual day numbers
             }
             count += 1
         }
